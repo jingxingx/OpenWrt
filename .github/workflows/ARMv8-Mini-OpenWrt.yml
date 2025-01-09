@@ -1,9 +1,13 @@
 name: ARMv8 Mini OpenWrt
 
 on:
+  repository_dispatch:
   workflow_dispatch:
-  schedule:
-    - cron: 0 20 * * *
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -131,6 +135,10 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
+
+    - name: Start SSH via tmate
+      uses: rdp-studio/ssh2actions@main
+      if: github.event.inputs.ssh == 'true'
 
     - name: Compile Firmware
       id: compile
